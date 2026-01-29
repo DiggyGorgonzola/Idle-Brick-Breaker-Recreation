@@ -97,7 +97,7 @@
     let total_balls_bought = 0;
 
     let bricks = [];
-    let brick_health = 10;
+    let brick_health = 1;
     function decrease_money(amt) {
         money -= amt
         SMT();
@@ -107,6 +107,24 @@
         document.getElementById("money-display").title = `Net Worth: $${netwth}`;
     }
     SMT();
+
+    function setAllTexts() {
+        SMT();
+
+        document.getElementById("add_ball").textContent = `Add Basic Ball ($${white_ball_cost})`;
+        document.getElementById("add_orange_ball").textContent = `Add Sniper Ball ($${orange_ball_cost})`;
+
+
+        document.getElementById("balls-display").textContent = `${balls.length}/${max_balls} balls`;
+        document.getElementById("balls-display").title = `${total_balls_bought} total balls purchased`;
+
+        document.getElementById("PC-display").textContent = `P.C.: ${prestige_count}`;
+        document.getElementById("PC-display").title = `Prestige Badges: ${prestige_badges}`;
+
+        document.getElementById("incrobal").textContent = `Increase Sniper Ball DMG (${orange_ball_dmg})`;
+        document.getElementById("incrwbal").textContent = `Increase Basic Ball DMG (${white_ball_dmg})`;
+        
+    }
 
     function prestige() {
         for (const ball of balls) {
@@ -467,19 +485,7 @@
         shop(prestige_badges > 0, document.getElementById("incrwbal"));
         shop(prestige_badges > 0, document.getElementById("incrobal"));
         shop(brick_health >= 5, document.getElementById("prestige"));
-        document.getElementById("add_ball").textContent = `Add Basic Ball ($${white_ball_cost})`;
-        document.getElementById("add_orange_ball").textContent = `Add Sniper Ball ($${orange_ball_cost})`;
-
-
-        document.getElementById("balls-display").textContent = `${balls.length}/${max_balls} balls`;
-        document.getElementById("balls-display").title = `${total_balls_bought} total balls purchased`;
-
-        document.getElementById("PC-display").textContent = `P.C.: ${prestige_count}`;
-        document.getElementById("PC-display").title = `Prestige Badges: ${prestige_badges}`;
-
-        document.getElementById("incrobal").textContent = `Increase Sniper Ball DMG (${orange_ball_dmg})`;
-        document.getElementById("incrwbal").textContent = `Increase Basic Ball DMG (${white_ball_dmg})`;
-        /*add stuff for prestige*/
+        setAllTexts();
         requestAnimationFrame(gameLoop);
     }
 
