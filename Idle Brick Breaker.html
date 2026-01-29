@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DIGGY BRICK BREAKER!!!!</title>
+</head>
+
+<style>
+        body {
+            background-color:burlywood;
+            display: flex;
+            flex-direction:column;
+            align-items:center;
+        }
+        .box {
+            position:relative;
+            background-color:gainsboro;
+            border:1px solid black;
+            width:800px;
+            height:800px;
+        }
+        .white-ball {
+            position:absolute;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            border:1px solid black;
+            background:white;
+        }
+        .orange-ball {
+            position:absolute;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            border:1px solid black;
+            background:orange;
+        }
+        .brick {
+            width: 60px;
+            height: 20px;
+            background: lime;
+            position: absolute;
+            border: 1px solid black;
+        }
+</style>
+
+<body>
+    <h>Diggy Brick Breaker :3</h><br>
+    <div style="display:flex;justify-content:space-around">
+        <div class="box">
+            <h id="balls-display" style="position:relative;z-index:999;padding:5px;background-color:white;border:1px solid black;top:-3.5%">0/30 balls</h>
+            <h id="PC-display" style="position:relative;z-index:999;padding:5px;background-color:white;border:1px solid black;top:-3.5%">P.C.:0</h>
+            <h id="money-display" style="position:relative;z-index:999;padding:5px;background-color:white;border:1px solid black;top:-3.5%;">Money: $0 </h>
+        </div>
+        <div>
+            <button id="prestige" onclick="prestige()">PRESTIGE (lvl 5 required)</button>
+            <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
+                <button id="add_ball" onclick="add_ball('white-ball');">Add Basic Ball</button>
+                <button id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
+                <button id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
+            </div>
+            <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
+                <button id="add_orange_ball" onclick="add_ball('orange-ball');">Add Sniper Ball</button>
+                <button id="delobal" onclick="deleteBall('orange-ball')">Delete Sniper Ball</button>
+                <button id="incrobal" onclick="increaseDamage('orange-ball')">Increase Sniper Ball DMG (2)</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+<!--Shop stuff-->
+<script>
+    function shop(requirement, button) {
+        if (requirement) {
+            button.disabled = false;
+        } else {
+            button.disabled = true
+        }
+    }
+
+</script>
+
+<!--Game stuff-->
+<script>
+    let money = 20;
+    max_balls = 30;
+    prestige_badges = 0;
+    prestige_count = 0;
+    white_ball_cost = 3;
+    orange_ball_cost = 15;
+
+    white_ball_dmg = 1;
+    orange_ball_dmg = 2;
+    let balls = [];
+    let bricks = [];
+    let brick_health = 1;
+    function decrease_money(amt) {
+        money -= amt
+        SMT();
+    }
+    function SMT() {
+        document.getElementById("money-display").textContent = `Money: $${money}`;
+    }
+    SMT();
+
+    function prestige() {
+        for (const ball of balls) {
+            ball.link.remove()
+        }
+        for (const brick of bricks) {
+            brick.link.remove()
+        }
+        balls = [];
+        bricks = [];
+        brick_health = 1;
+        white_ball_cost = 3;
+        orange_ball_cost = 15;
+        money = 20;
+        prestige_count++;
+        prestige_badges++;
+        create_boxes();
+        gameLoop();
+    }
+    
+    function deleteBall(type) { 
+        for (const ball of balls) {
+            if (ball.class == type) {
+                ball.link.remove();
+                balls = balls.filter(item => item !== ball);
+                return null;
+            }
+        }
+    }
+    
+    function increaseDamage(type) {
+        prestige_badges--;
+        if (type == "white-ball") {white_ball_dmg++};
+        if (type == "orange-ball") {orange_ball_dmg++};
+        for (const ball of balls) {
+            if (ball.class = "white-ball") {
+                ball.dmg = white_ball_dmg;
+            }
+            if (ball.class = "orange-ball") {
+                ball.dmg = orange_ball_dmg;
+            }
+        }
+    }
+    
+    function vec(x, y) {
+        return { x, y };
+    }
+    function dot(a, b) {
+        return a.x * b.x + a.y * b.y;
+    }
+    function normalize(v) {
+        const len = Math.hypot(v.x, v.y);
+        return len === 0 ? vec(0, 0) : vec(v.x / len, v.y / len);
+    }
+    
+    
+    function getCenter(rect) {
+        return vec(
+            rect.left + rect.width / 2,
+            rect.top + rect.height / 2
+        );
+    }
+    function getDistance(ball, brick) {
+        const x = ball.x
+        const y = ball.y
+        const rad = Number(ball.rad.slice(0,-2))
+        brick_x = brick.x
+        brick_y = brick.y
+        distance=(Math.sqrt((brick_x-x)**2 + (brick_y-y)**2))
+
+        return distance
+    }
+    function GCBV(ball) {
+        brick = getClosestBrick(ball);
+        if (!brick) return;
+        const canvasRect = document.querySelector(".box").getBoundingClientRect()
+        const brickRect = brick.link.getBoundingClientRect()
+        const brickCenter = {
+            x: brickRect.left + brickRect.width / 2 - canvasRect.left,
+            y: brickRect.top + brickRect.height / 2 - canvasRect.top
+        };
+        const ballCenter = vec(
+            ball.x + 20 / 2,
+            ball.y + 20 / 2
+        );
+        const dir = normalize({
+            x: brickCenter.x - ballCenter.x,
+            y: brickCenter.y - ballCenter.y
+        });
+
+        const speed = Math.hypot(ball.vx, ball.vy) || 1;
+
+        ball.vx = dir.x * speed;
+        ball.vy = dir.y * speed;
+        
+    }
+    function GCBVSteer(ball) {
+        brick = getClosestBrick(ball);
+        if (!brick) return;
+        const canvasRect = document.querySelector(".box").getBoundingClientRect()
+        const brickRect = brick.link.getBoundingClientRect()
+        const brickCenter = {
+            x: brickRect.left + brickRect.width / 2 - canvasRect.left,
+            y: brickRect.top + brickRect.height / 2 - canvasRect.top
+        };
+        const ballCenter = vec(
+            ball.x + 20 / 2,
+            ball.y + 20 / 2
+        );
+        const dir = normalize({
+            x: brickCenter.x - ballCenter.x,
+            y: brickCenter.y - ballCenter.y
+        });
+
+        const speed = Math.hypot(ball.vx, ball.vy) || 1;
+        const a = normalize({
+            x:ball.vx + dir.x,
+            y:ball.vy + dir.y
+        });
+        ball.vx = a.x * speed;
+        ball.vy = a.y * speed;
+    }
+    function getClosestBrick(ball) {
+        mindist = 999
+        minbrick = bricks[0]
+        for (const brick of bricks) {
+            if (getDistance(ball, brick) < mindist) {
+                minbrick = brick
+                mindist = getDistance(ball, brick)
+            }
+        }
+        return minbrick
+    }
+    
+    function get_dmg(stringy) {
+        if (stringy == "white-ball") {return white_ball_dmg};
+        if (stringy == "orange-ball") {return orange_ball_dmg};
+    }
+    function add_ball(type) { 
+        if (balls.length < max_balls) {
+            if (type == "white-ball") {
+                decrease_money(white_ball_cost);
+                white_ball_cost = Math.round(white_ball_cost * 1.1 + 1);
+            }
+            if (type == "orange-ball") {
+                decrease_money(orange_ball_cost);
+                orange_ball_cost = Math.round(orange_ball_cost * 1.1 + 1);
+            }
+            const circle = document.createElement("div");
+            circle.classList.add(type);
+            const spawnpoint = [400, 600]
+            const box = document.querySelector(".box");
+
+            const x = spawnpoint[0];
+            const y = spawnpoint[1];
+
+            angle = 2*Math.PI*(Math.random());
+            velo = 10
+
+            const vx = Math.cos(angle)*velo;
+            const vy = Math.sin(angle)*velo;
+            const newBall = {
+                x: x,
+                y: y,
+                vx: vx,
+                vy: vy,
+                rad: "20px",
+                class: type,
+                dmg: get_dmg(type),
+                link: circle,
+            }
+            balls.push(newBall)
+
+            document.querySelector(".box").appendChild(circle);
+            console.log("hi");
+        };
+    };
+    function attackBrick(brick, dmg) {
+        brick.health -= dmg;
+        if (brick.health < 1) {
+            brick.link.remove();
+            money += brick_health;
+            SMT();
+        } else {
+            brick.link.children[0].textContent = brick.health;
+        }
+    }
+    function SBTSP(spawnpoint) {
+        for (const ball of balls) {
+            const x = spawnpoint[0];
+            const y = spawnpoint[1];
+
+            ball.x = x;
+            ball.y = y;
+        }
+    }
+    function create_boxes() {
+        const box = document.querySelector(".box");
+
+
+        const brickWidth = 60;
+        const brickHeight = 20;
+        const padding = 5;
+
+        const cols = Math.floor(document.querySelector(".box").getBoundingClientRect().width/(brickWidth+padding));
+        const rows = 20;
+        console.log("Making new bricks...")
+        console.log(bricks)
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const brick = document.createElement("div")
+                brick.classList.add("brick")
+                brick.style.width = `${brickWidth}px`;
+                brick.style.height = `${brickHeight}px`
+                brick.style.position = "absolute";
+                brick.style.textAlign = "center";
+
+                const Brick = {
+                    x: padding+c * (brickWidth+padding),
+                    y: padding+r * (brickHeight+padding),
+                    health: brick_health,
+                    link: brick,
+                }
+
+                Brick.link.style.top = `${Brick.y}px`;
+                Brick.link.style.left = `${Brick.x}px`;
+                bricks.push(Brick);
+                Brick.link.addEventListener("click", () => {attackBrick(Brick, 1)});
+                box.appendChild(brick);
+            }
+        }
+        for (const brick of bricks) {
+            const health_text = document.createElement("h");
+            health_text.style.userSelect = "none";
+            health_text.textContent = brick.health
+            brick.link.appendChild(health_text);
+        }
+    }
+
+    function checkCollision(ball, brick) {
+        const ballRect = ball.link.getBoundingClientRect();
+        const brickRect = brick.link.getBoundingClientRect();
+
+        return !(
+            ballRect.right < brickRect.left ||
+            ballRect.left > brickRect.right ||
+            ballRect.bottom < brickRect.top ||
+            ballRect.top > brickRect.bottom
+        );
+    }
+    function bounceBall(ball, brick) {
+        const ballRect = ball.link.getBoundingClientRect();
+        const brickRect = brick.link.getBoundingClientRect();
+
+        const ballCenter = getCenter(ballRect);
+        const brickCenter = getCenter(brickRect);
+
+        let normal = vec(
+            ballCenter.x - brickCenter.x,
+            ballCenter.y - brickCenter.y
+        );
+
+        const overlapX =
+            Math.min(ballRect.right, brickRect.right) -
+            Math.max(ballRect.left, brickRect.left);
+
+        const overlapY =
+            Math.min(ballRect.bottom, brickRect.bottom) -
+            Math.max(ballRect.top, brickRect.top);
+
+        if (overlapX < overlapY) {
+            normal = vec(Math.sign(normal.x), 0);
+        } else {
+            normal = vec(0, Math.sign(normal.y));
+        }
+
+        normal = normalize(normal);
+
+        const velocity = vec(ball.vx, ball.vy);
+        const d = dot(velocity, normal);
+
+        ball.vx = velocity.x - 2 * d * normal.x;
+        ball.vy = velocity.y - 2 * d * normal.y;
+
+        attackBrick(brick, ball.dmg);
+    }
+    function deflect_balls() {
+        for (const ball of balls) {
+            if (bricks.length > 0) {
+                for (const brick of bricks) {
+                    if (getDistance(ball, brick) < 80 && checkCollision(ball, brick)) {
+                        bounceBall(ball, brick);
+                    }
+                };
+            } else {
+                SBTSP([400,600])
+                brick_health++;
+                create_boxes();
+            };
+        };
+        bricks = bricks.filter(item => item.health > 0)
+    };
+    
+    function step() {
+        const box = document.querySelector(".box");
+        for (const ball of balls) {
+            let x = parseFloat(ball.x) || 0;
+            let y = parseFloat(ball.y) || 0;
+
+            let vx = Number(ball.vx) || 0;
+            let vy = Number(ball.vy) || 0;
+
+            x += vx;
+            y += vy;
+
+            ball.x = x
+            ball.y = y
+
+            ball.link.style.top = `${ball.y}px`;
+            ball.link.style.left = `${ball.x}px`;
+
+
+
+            if (x < 0) {
+                ball.vx = Math.abs(ball.vx)
+                if (ball.class == "orange-ball") {
+                    GCBV(ball)
+                }
+            }
+            else if (x + 20 > box.clientWidth) {
+                ball.vx = -1 * Math.abs(ball.vx)
+                if (ball.class == "orange-ball") {
+                    GCBV(ball)
+                }
+            }
+
+            if (y < 0) {
+                ball.vy = Math.abs(ball.vy)
+                if (ball.class == "orange-ball") {
+                    GCBV(ball)
+                }
+            }
+            else if (y + 20 > box.clientHeight) {
+                ball.vy = -1 * Math.abs(ball.vy)
+                if (ball.class == "orange-ball") {
+                    GCBV(ball)
+                }
+            }
+        };
+    }
+    function gameLoop() {
+        step();
+        deflect_balls();
+        shop(money >= white_ball_cost && balls.length < max_balls, document.getElementById("add_ball"));
+        shop(money >= orange_ball_cost && balls.length < max_balls, document.getElementById("add_orange_ball"));
+        shop(prestige_badges > 0, document.getElementById("incrwbal"));
+        shop(prestige_badges > 0, document.getElementById("incrobal"));
+        shop(brick_health >= 5, document.getElementById("prestige"));
+        document.getElementById("add_ball").textContent = `Add Basic Ball ($${white_ball_cost})`;
+        document.getElementById("add_orange_ball").textContent = `Add Sniper Ball ($${orange_ball_cost})`;
+
+
+        document.getElementById("balls-display").textContent = `${balls.length}/${max_balls} balls`;
+        document.getElementById("PC-display").textContent = `P.C.: ${prestige_count}`;
+
+        document.getElementById("incrobal").textContent = `Increase Sniper Ball DMG (${orange_ball_dmg})`;
+        document.getElementById("incrwbal").textContent = `Increase Basic Ball DMG (${white_ball_dmg})`;
+        /*add stuff for prestige*/
+        requestAnimationFrame(gameLoop);
+    }
+
+    document.body.onload = (() => {
+        create_boxes();})
+    requestAnimationFrame(gameLoop);
+</script> 
