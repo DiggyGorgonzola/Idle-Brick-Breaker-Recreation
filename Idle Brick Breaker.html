@@ -54,12 +54,12 @@
         <div>
             <button id="prestige" onclick="prestige()">PRESTIGE (lvl 5 required)</button>
             <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
-                <button id="add_ball" onclick="add_ball('white-ball');">Add Basic Ball</button>
+                <button id="add_white_ball" onclick="addBall('white-ball');">Add Basic Ball</button>
                 <button id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
                 <button id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
             </div>
             <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
-                <button id="add_orange_ball" onclick="add_ball('orange-ball');">Add Sniper Ball</button>
+                <button id="add_orange_ball" onclick="addBall('orange-ball');">Add Sniper Ball</button>
                 <button id="delobal" onclick="deleteBall('orange-ball')">Delete Sniper Ball</button>
                 <button id="incrobal" onclick="increaseDamage('orange-ball')">Increase Sniper Ball DMG (2)</button>
             </div>
@@ -76,6 +76,18 @@
         } else {
             button.disabled = true
         }
+    }
+
+    function setAllShops() {
+        shop(money >= white_ball_cost && balls.length < max_balls, document.getElementById("add_white_ball"));
+        shop(money >= orange_ball_cost && balls.length < max_balls, document.getElementById("add_orange_ball"));
+
+        shop(brick_health >= 5, document.getElementById("prestige"));
+
+        shop(prestige_badges > 0, document.getElementById("incrwbal"));
+        shop(prestige_badges > 0, document.getElementById("incrobal"));
+
+
     }
 
 </script>
@@ -111,7 +123,7 @@
     function setAllTexts() {
         SMT();
 
-        document.getElementById("add_ball").textContent = `Add Basic Ball ($${white_ball_cost})`;
+        document.getElementById("add_white_ball").textContent = `Add Basic Ball ($${white_ball_cost})`;
         document.getElementById("add_orange_ball").textContent = `Add Sniper Ball ($${orange_ball_cost})`;
 
 
@@ -142,7 +154,7 @@
         money = 20;
         netwth = 20;
         prestige_count++;
-        create_boxes();
+        createBoxes();
     }
     
     function deleteBall(type) { 
@@ -259,11 +271,11 @@
         return minbrick
     }
     
-    function get_dmg(stringy) {
+    function getDMG(stringy) {
         if (stringy == "white-ball") {return white_ball_dmg};
         if (stringy == "orange-ball") {return orange_ball_dmg};
     }
-    function add_ball(type) { 
+    function addBall(type) { 
         if (balls.length < max_balls) {
             total_balls_bought++;
             if (type == "white-ball") {
@@ -294,7 +306,7 @@
                 vy: vy,
                 rad: "20px",
                 class: type,
-                dmg: get_dmg(type),
+                dmg: getDMG(type),
                 link: circle,
             }
             balls.push(newBall)
@@ -323,7 +335,7 @@
             ball.y = y;
         }
     }
-    function create_boxes() {
+    function createBoxes() {
         const box = document.querySelector(".box");
 
 
@@ -413,7 +425,7 @@
 
         attackBrick(brick, ball.dmg);
     }
-    function deflect_balls() {
+    function deflectBalls() {
         for (const ball of balls) {
             if (bricks.length > 0) {
                 for (const brick of bricks) {
@@ -424,7 +436,7 @@
             } else {
                 SBTSP([400,600])
                 brick_health++;
-                create_boxes();
+                createBoxes();
             };
         };
         bricks = bricks.filter(item => item.health > 0)
@@ -479,17 +491,13 @@
     }
     function gameLoop() {
         step();
-        deflect_balls();
-        shop(money >= white_ball_cost && balls.length < max_balls, document.getElementById("add_ball"));
-        shop(money >= orange_ball_cost && balls.length < max_balls, document.getElementById("add_orange_ball"));
-        shop(prestige_badges > 0, document.getElementById("incrwbal"));
-        shop(prestige_badges > 0, document.getElementById("incrobal"));
-        shop(brick_health >= 5, document.getElementById("prestige"));
+        deflectBalls();
+        setAllShops();
         setAllTexts();
         requestAnimationFrame(gameLoop);
     }
 
     document.body.onload = (() => {
-        create_boxes();})
+        createBoxes();})
     requestAnimationFrame(gameLoop);
 </script> 
