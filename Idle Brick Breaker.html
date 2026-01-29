@@ -83,6 +83,8 @@
 <!--Game stuff-->
 <script>
     let money = 20;
+    let netwth = 20;
+
     max_balls = 30;
     prestige_badges = 0;
     prestige_count = 0;
@@ -92,6 +94,8 @@
     white_ball_dmg = 1;
     orange_ball_dmg = 2;
     let balls = [];
+    let total_balls_bought = 0;
+
     let bricks = [];
     let brick_health = 1;
     function decrease_money(amt) {
@@ -100,6 +104,7 @@
     }
     function SMT() {
         document.getElementById("money-display").textContent = `Money: $${money}`;
+        document.getElementById("money-display").title = `Net Worth: $${netwth}`;
     }
     SMT();
 
@@ -116,6 +121,7 @@
         white_ball_cost = 3;
         orange_ball_cost = 15;
         money = 20;
+        netwth = 20;
         prestige_count++;
         prestige_badges++;
         create_boxes();
@@ -242,6 +248,7 @@
     }
     function add_ball(type) { 
         if (balls.length < max_balls) {
+            total_balls_bought++;
             if (type == "white-ball") {
                 decrease_money(white_ball_cost);
                 white_ball_cost = Math.round(white_ball_cost * 1.1 + 1);
@@ -284,6 +291,7 @@
         if (brick.health < 1) {
             brick.link.remove();
             money += brick_health;
+            netwth += brick_health;
             SMT();
         } else {
             brick.link.children[0].textContent = brick.health;
@@ -465,7 +473,10 @@
 
 
         document.getElementById("balls-display").textContent = `${balls.length}/${max_balls} balls`;
+        document.getElementById("balls-display").title = `${total_balls_bought} total balls purchased`;
+
         document.getElementById("PC-display").textContent = `P.C.: ${prestige_count}`;
+        document.getElementById("PC-display").title = `Prestige Badges: ${prestige_badges}`;
 
         document.getElementById("incrobal").textContent = `Increase Sniper Ball DMG (${orange_ball_dmg})`;
         document.getElementById("incrwbal").textContent = `Increase Basic Ball DMG (${white_ball_dmg})`;
