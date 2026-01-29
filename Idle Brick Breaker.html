@@ -97,7 +97,7 @@
     let total_balls_bought = 0;
 
     let bricks = [];
-    let brick_health = 1;
+    let brick_health = 10;
     function decrease_money(amt) {
         money -= amt
         SMT();
@@ -115,6 +115,7 @@
         for (const brick of bricks) {
             brick.link.remove()
         }
+        prestige_badges += Math.ceil((brick_health-4)/4);
         balls = [];
         bricks = [];
         brick_health = 1;
@@ -123,9 +124,7 @@
         money = 20;
         netwth = 20;
         prestige_count++;
-        prestige_badges++;
         create_boxes();
-        gameLoop();
     }
     
     function deleteBall(type) { 
