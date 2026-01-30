@@ -55,10 +55,10 @@
         <div>
             <button id="prestige" onclick="prestige()">PRESTIGE (lvl 5 required)</button>
             <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
-                <button id="add_white_ball" onclick="addBall('white-ball');">Add Basic Ball</button>
-                <button id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
-                <button id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
-                <button id="incrwbalspd" onclick="increaseSpeed('white-ball')">Increase Basic Ball SPD (.4)</button>
+                <button style="margin:5px;" id="add_white_ball" onclick="addBall('white-ball');">Add Basic Ball</button>
+                <button style="margin:5px;" id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
+                <button style="margin:5px;" id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
+                <button style="margin:5px;" id="incrwbalspd" onclick="increaseSpeed('white-ball')">Increase Basic Ball SPD (.4)</button>
             </div>
             <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
                 <button id="add_orange_ball" onclick="addBall('orange-ball');">Add Sniper Ball</button>
@@ -533,4 +533,5 @@
         createBoxes();})
     requestAnimationFrame(gameLoop);
 </script> 
+
 
