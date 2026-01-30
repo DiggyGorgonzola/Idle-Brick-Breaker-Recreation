@@ -17,7 +17,7 @@
             background-color:gainsboro;
             border:1px solid black;
             width:800px;
-            height:fit-content;
+            height:800px;
         }
         .white-ball {
             position:absolute;
@@ -54,17 +54,17 @@
         </div>
         <div>
             <button id="prestige" onclick="prestige()">PRESTIGE (lvl 5 required)</button>
-            <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
+            <div style="width:200px;height:fit-content;margin:5px;background-color:white;border:1px solid black;padding:5px;">
                 <button style="margin:5px;" id="add_white_ball" onclick="addBall('white-ball');">Add Basic Ball</button>
                 <button style="margin:5px;" id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
                 <button style="margin:5px;" id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
                 <button style="margin:5px;" id="incrwbalspd" onclick="increaseSpeed('white-ball')">Increase Basic Ball SPD (.4)</button>
             </div>
-            <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
-                <button id="add_orange_ball" onclick="addBall('orange-ball');">Add Sniper Ball</button>
-                <button id="delobal" onclick="deleteBall('orange-ball')">Delete Sniper Ball</button>
-                <button id="incrobal" onclick="increaseDamage('orange-ball')">Increase Sniper Ball DMG (2)</button>
-                <button id="incrobalspd" onclick="increaseSpeed('orange-ball')">Increase Sniper Ball SPD (.9)</button>
+            <div style="width:200px;height:fit-content;margin:5px;background-color:white;border:1px solid black;padding:5px;">
+                <button style="margin:5px;" id="add_orange_ball" onclick="addBall('orange-ball');">Add Sniper Ball</button>
+                <button style="margin:5px;" id="delobal" onclick="deleteBall('orange-ball')">Delete Sniper Ball</button>
+                <button style="margin:5px;" id="incrobal" onclick="increaseDamage('orange-ball')">Increase Sniper Ball DMG (2)</button>
+                <button style="margin:5px;" id="incrobalspd" onclick="increaseSpeed('orange-ball')">Increase Sniper Ball SPD (.9)</button>
             </div>
         </div>
     </div>
@@ -533,6 +533,7 @@
         createBoxes();})
     requestAnimationFrame(gameLoop);
 </script> 
+
 
 
 
