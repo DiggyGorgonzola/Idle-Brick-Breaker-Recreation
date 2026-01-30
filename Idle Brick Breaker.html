@@ -58,11 +58,13 @@
                 <button id="add_white_ball" onclick="addBall('white-ball');">Add Basic Ball</button>
                 <button id="delwbal" onclick="deleteBall('white-ball')">Delete Basic Ball</button>
                 <button id="incrwbal" onclick="increaseDamage('white-ball')">Increase Basic Ball DMG (1)</button>
+                <button id="incrwbalspd" onclick="increaseSpeed('white-ball')">Increase Basic Ball SPD (.4)</button>
             </div>
             <div style="width:200px;height:100px;margin:5px;background-color:white;border:1px solid black;padding:5px;">
                 <button id="add_orange_ball" onclick="addBall('orange-ball');">Add Sniper Ball</button>
                 <button id="delobal" onclick="deleteBall('orange-ball')">Delete Sniper Ball</button>
                 <button id="incrobal" onclick="increaseDamage('orange-ball')">Increase Sniper Ball DMG (2)</button>
+                <button id="incrobalspd" onclick="increaseSpeed('orange-ball')">Increase Sniper Ball SPD (.9)</button>
             </div>
         </div>
     </div>
@@ -87,6 +89,9 @@
 
         shop(prestige_badges > 0, document.getElementById("incrwbal"));
         shop(prestige_badges > 0, document.getElementById("incrobal"));
+        
+        shop(prestige_badges > 0, document.getElementById("incrwbalspd"));
+        shop(prestige_badges > 0, document.getElementById("incrobalspd"));
 
 
     }
@@ -105,12 +110,17 @@
     orange_ball_cost = 15;
 
     white_ball_dmg = 1;
+    white_ball_spd = .4;
+    
     orange_ball_dmg = 2;
+    orange_ball_spd = .9;
+    
+    
     let balls = [];
     let total_balls_bought = 0;
 
     let bricks = [];
-    let brick_health = 1;
+    let brick_health = 100;
     function decrease_money(amt) {
         money -= amt
         SMT();
@@ -136,6 +146,9 @@
 
         document.getElementById("incrobal").textContent = `Increase Sniper Ball DMG (${orange_ball_dmg})`;
         document.getElementById("incrwbal").textContent = `Increase Basic Ball DMG (${white_ball_dmg})`;
+        
+        document.getElementById("incrobalspd").textContent = `Increase Sniper Ball SPD (${orange_ball_spd})`;
+        document.getElementById("incrwbalspd").textContent = `Increase Basic Ball SPD (${white_ball_spd})`;
         
     }
 
@@ -178,6 +191,19 @@
             }
             if (ball.class = "orange-ball") {
                 ball.dmg = orange_ball_dmg;
+            }
+        }
+    }
+    function increaseSpeed(type) {
+        prestige_badges--;
+        if (type == "white-ball") {white_ball_spd += .5};
+        if (type == "orange-ball") {orange_ball_spd += .5};
+        for (const ball of balls) {
+            if (ball.class = "white-ball") {
+                ball.spd = white_ball_spd;
+            }
+            if (ball.class = "orange-ball") {
+                ball.spd = orange_ball_spd;
             }
         }
     }
@@ -257,8 +283,8 @@
             x:ball.vx + dir.x,
             y:ball.vy + dir.y
         });
-        ball.vx = a.x * speed;
-        ball.vy = a.y * speed;
+        ball.vx = a.x * speed * ball.spd;
+        ball.vy = a.y * speed * ball.spd;
     }
     function getClosestBrick(ball) {
         mindist = 999
@@ -275,6 +301,10 @@
     function getDMG(stringy) {
         if (stringy == "white-ball") {return white_ball_dmg};
         if (stringy == "orange-ball") {return orange_ball_dmg};
+    }
+    function getSPD(stringy) {
+        if (stringy == "white-ball") {return white_ball_spd};
+        if (stringy == "orange-ball") {return orange_ball_spd};
     }
     function addBall(type) { 
         if (balls.length < max_balls) {
@@ -305,6 +335,7 @@
                 y: y,
                 vx: vx,
                 vy: vy,
+                spd: getSPD(type),
                 rad: "20px",
                 class: type,
                 dmg: getDMG(type),
@@ -452,8 +483,8 @@
             let vx = Number(ball.vx) || 0;
             let vy = Number(ball.vy) || 0;
 
-            x += vx;
-            y += vy;
+            x += Number(ball.spd) * vx;
+            y += Number(ball.spd) * vy;
 
             ball.x = x
             ball.y = y
